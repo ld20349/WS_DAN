@@ -116,7 +116,7 @@ def _convert_dataset(split_name, dataset, dataset_dir):
 
     with tf.Graph().as_default():
         image_reader = ImageReader()
-        
+
         config = tf.ConfigProto(
             allow_soft_placement=True,
             log_device_placement=False)
@@ -131,10 +131,10 @@ def _convert_dataset(split_name, dataset, dataset_dir):
 
                 with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
                     start_ndx = shard_id * num_per_shard
-                    end_ndx = min((shard_id+1) * num_per_shard, len(dataset))
+                    end_ndx = min((shard_id + 1) * num_per_shard, len(dataset))
                     for i in range(start_ndx, end_ndx):
                         sys.stdout.write('\r>> Converting %s image %d/%d shard %d' % (split_name,
-                            i+1, len(dataset), shard_id))
+                                                                                      i + 1, len(dataset), shard_id))
                         sys.stdout.flush()
 
                         # Read the filename:
@@ -151,10 +151,30 @@ def _convert_dataset(split_name, dataset, dataset_dir):
     sys.stdout.flush()
 
 
+def np_loadtxt_str(filename):
+    with open(filename, 'r') as f:
+        lines = [x.strip() for x in f.readlines()]
+    rows = []
+    for line in lines:
+        parts = line.split(' ')
+        rows.append([parts[0], parts[1]])
+    return np.array(rows, dtype=np.dtype('str', 'str'))
+
+
+def np_loadtxt_int(filename):
+    with open(filename, 'r') as f:
+        lines = [x.strip() for x in f.readlines()]
+    rows = []
+    for line in lines:
+        parts = line.split(' ')
+        rows.append([int(parts[0]), int(parts[1])])
+    return np.array(rows, dtype=np.dtype('int', 'int'))
+
+
 def generate_datasets(data_root):
-    train_test = np.loadtxt(os.path.join(data_root, 'train_test_split.txt'), int)
-    images_files = np.loadtxt(os.path.join(data_root, 'images.txt'), str)
-    labels = np.loadtxt(os.path.join(data_root, 'image_class_labels.txt'), int) - 1
+    train_test = np_loadtxt_int(os.path.join(data_root, 'train_test_split.txt'))
+    images_files = np_loadtxt_str(os.path.join(data_root, 'images.txt'))
+    labels = np_loadtxt_int(os.path.join(data_root, 'image_class_labels.txt')) - 1
     # parts = np.loadtxt(os.path.join(data_root, 'parts',  'part_locs.txt'), float)
     # parts = np.reshape(parts, [-1, 15, parts.shape[-1]])
     #

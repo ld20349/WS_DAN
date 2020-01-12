@@ -13,3 +13,6 @@ build
 scripts
 *.pyc
 .DS_Store
+
+test.py
+temp.py
